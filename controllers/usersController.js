@@ -16,7 +16,16 @@ module.exports = {
 
   async getAllUsers(req, res) {
     try {
-      const users = await User.find();
+      const users = await User.find()
+      .populate({
+        path: "thoughts",
+        select: "-__v",
+      })
+      .populate({
+        path: "friends",
+        select: "-__v",
+      })
+      .select("-__v");
       res.json(users);
     } catch (err) {
       console.log("Cannot find users",err);
@@ -29,7 +38,15 @@ module.exports = {
   async getUserById( req, res) {
     try {
       const user = await User.findOne({ _id: req.params.id })
-        .select('-__v');
+      .populate({
+        path: "thoughts",
+        select: "-__v",
+      })
+      .populate({
+        path: "friends",
+        select: "-__v",
+      })
+      .select('-__v');
       if (!user) {
         return res.status(404).json({ message: 'No user with this id!' });
       }
@@ -59,7 +76,8 @@ module.exports = {
 
   async updateUser(req, res) {
     try {
-      const updatedUser = await User.findOneAndUpdate( { _id: req.params.id });
+      const updatedUser = await User.findOneAndUpdate( { _id: req.params.id }, req.body, { new: true, runValidators: true });
+      
       if (!updatedUser) {
         return res.status(404).json({ message: 'No user with this id!' });
       }
@@ -109,5 +127,3 @@ module.exports = {
     }
   },
 }
-
-module.exports = userController;

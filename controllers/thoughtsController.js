@@ -2,9 +2,29 @@ const { User, Thought } = require('../models');
 
 module.exports = {
 
+  // async createThought(req, res) {
+  //   try {
+  //     const thought = await Thought.create(req.body)
+  //     res.json(thought);
+  //   } catch (err) {
+  //     console.log("Cannot create thought", err);
+  //     return res.status(500).json(err);
+  //   }
+  // },
+
   async createThought(req, res) {
     try {
-      const thought = await Thought.create(req.body);
+      const thought = await Thought.create(req.body); // Create the thought first
+      
+      const userId = req.body.userId; // Get the userId from the request body
+      
+      // Update the user's thoughts array
+      await User.findByIdAndUpdate(
+        userId,
+        { $push: { thoughts: thought._id } },
+        { new: true }
+      );
+  
       res.json(thought);
     } catch (err) {
       console.log("Cannot create thought", err);
@@ -59,7 +79,7 @@ module.exports = {
 
   async updateThought(req, res) {
     try {
-      const updatedThought = await Thought.findOneAndUpdate({ _id: req.params.id });
+      const updatedThought = await Thought.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true, runValidators: true });
       if (!updatedThought) {
         return res.status(404).json({ message: 'No thought with this id!' });
       }
@@ -110,4 +130,3 @@ module.exports = {
   }
 };
 
-module.exports = thoughtsController;
