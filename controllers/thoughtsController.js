@@ -2,23 +2,11 @@ const { User, Thought } = require('../models');
 
 module.exports = {
 
-  // async createThought(req, res) {
-  //   try {
-  //     const thought = await Thought.create(req.body)
-  //     res.json(thought);
-  //   } catch (err) {
-  //     console.log("Cannot create thought", err);
-  //     return res.status(500).json(err);
-  //   }
-  // },
-
   async createThought(req, res) {
     try {
-      const thought = await Thought.create(req.body); // Create the thought first
+      const thought = await Thought.create(req.body); 
+      const userId = req.body.userId; 
       
-      const userId = req.body.userId; // Get the userId from the request body
-      
-      // Update the user's thoughts array
       await User.findByIdAndUpdate(
         userId,
         { $push: { thoughts: thought._id } },
@@ -34,7 +22,12 @@ module.exports = {
 
   async getAllThoughts(req, res) {
     try {
-      const thoughts = await Thought.find();
+      const thoughts = await Thought.find()
+      .populate({
+        path: "reactions",
+        select: "-__v",
+      })
+      .select('-__v');
       res.json(thoughts);
     } catch (err) {
       console.log("Cannot find thoughts", err);
@@ -46,7 +39,11 @@ module.exports = {
   async getThoughtById(req, res) {
     try {
       const thought = await Thought.findOne({ _id: req.params.id })
-        .select('-__v');
+      .populate({
+        path: "reactions",
+        select: "-__v",
+      })
+      .select('-__v');
       if (!thought) {
         return res.status(404).json({ message: 'No thought with this id!' });
       }
