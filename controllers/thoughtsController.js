@@ -41,7 +41,7 @@ module.exports = {
       const thought = await Thought.findOne({ _id: req.params.id })
       .populate({
         path: "reactions",
-        select: "-__v",
+        select: '-__v -_id -reactionId',
       })
       .select('-__v');
       if (!thought) {
@@ -112,7 +112,7 @@ module.exports = {
       const updatedThought = await Thought.findOneAndUpdate(
         { _id: req.params.id },
         { $pull: { reactions: { reactionId: req.params.reactionId } } },
-        { new: true }
+        { new: true },
       );
 
       if (!updatedThought) {
