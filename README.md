@@ -28,7 +28,7 @@ npm install
 
 ## Insomnia Screenshot
 
-![Screenshot](./assets/Screenshot.png)
+![Screenshot](./assets/Screenshot.jpg)
 
 ## License
 
